@@ -1,5 +1,5 @@
 
-var requestPermissions = { scope: 'public_profile, email' };
+var requestPermissions = { scope: 'public_profile, email, user_friends' };
 var FbUtils = {
 
     // This is called with the results from from FB.getLoginStatus().
@@ -12,7 +12,8 @@ var FbUtils = {
         // for FB.getLoginStatus().
         if (response.status === 'connected') {
             console.log("Logged into your app and Facebook.");
-            FbUtils.getInfo();
+            FbUtils.getUserInfo();
+            FbUtils.getRandomTaggableFriendInfo();
         } else if (response.status === 'not_authorized') {
             console.log("The person is logged into Facebook, but not your app");
         } else {
@@ -54,7 +55,7 @@ var FbUtils = {
     },
 
     // get user info when login successfully
-    getInfo: function () {
+    getUserInfo: function () {
         console.log('Welcome!  Fetching your information.... ');
         FB.api('/me?fields=name,email,first_name,last_name,age_range,link,timezone,updated_time,verified,picture,locale', function (response) {
             console.log('Successful login for: ' + JSON.stringify(response));
@@ -80,6 +81,16 @@ var FbUtils = {
         //     "this is description", 
         //     "http://img.f29.vnecdn.net/2016/10/16/xalu-1476599016_490x294.jpg", 
         //     "http://vnexpress.net/");
+    },
+
+    getRandomTaggableFriendInfo: function(){
+        FB.api('/me/taggable_friends', { fields: 'id,email,name,picture.width(480).height(480)' }, function(response) {
+            if(response.data != null && response.data.length > 0){
+                var randomFriend = response.data[Math.floor(Math.random() * (response.data.length - 1))];
+                document.getElementById('fb_friend_info').innerHTML = JSON.stringify(randomFriend);
+                console.log("friends: " + randomFriend.picture.data.url);
+            }
+        });
     },
 
     // should use for debug
