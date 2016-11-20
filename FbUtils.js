@@ -84,11 +84,16 @@ var FbUtils = {
     },
 
     getRandomTaggableFriendInfo: function(){
-        FB.api('/me/taggable_friends', { fields: 'id,email,name,picture.width(480).height(480)' }, function(response) {
-            if(response.data != null && response.data.length > 0){
-                var randomFriend = response.data[Math.floor(Math.random() * (response.data.length - 1))];
-                document.getElementById('fb_friend_info').innerHTML = JSON.stringify(randomFriend);
-                console.log("friends: " + randomFriend.picture.data.url);
+        FB.api('/me/friends', function(responseFriendInfo) {
+            if(responseFriendInfo){
+                console.log("friends: " + JSON.stringify(responseFriendInfo));
+                FB.api('/me/taggable_friends', { fields: 'id,email,name,picture.width(480).height(480)', limit:responseFriendInfo.summary.total_count }, function(response) {
+                    if(response.data != null && response.data.length > 0){
+                        var randomFriend = response.data[Math.floor(Math.random() * (response.data.length - 1))];
+                        document.getElementById('fb_friend_info').innerHTML = JSON.stringify(randomFriend);
+                        console.log("friends: " + JSON.stringify(response));
+                    }
+                });
             }
         });
     },
